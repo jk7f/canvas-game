@@ -1,0 +1,12 @@
+{
+  "name": "refactory",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "http-server -c-1 -s"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {}
+}

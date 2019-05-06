@@ -1,0 +1,15 @@
+{
+  "tileset": "src/tiles/tileset.json",
+  "layers": [
+    {
+      "tile": "wall",
+      "solid": true,
+      "coords": [0, 0, 16, 20]
+    },
+    {
+      "tile": "floor",
+      "solid": false,
+      "coords": [1, 1, 15, 19]
+    }
+  ]
+}

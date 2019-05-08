@@ -32,29 +32,32 @@ loadJson("src/levels/01.json").then(level => {
 
       window.addEventListener("keydown", e => {
         const movement = 8;
+        const playerSize = 16;
         function by16(coord) {
           return Math.floor(coord / 16);
         }
         if (e.key === "ArrowRight") {
           player.pos.x += movement;
-          if (tileMatrix[by16(player.pos.y)][by16(player.pos.x)].solid === true) {
-            player.pos.x -= movement;
-          }
         } else if (e.key === "ArrowLeft") {
           player.pos.x -= movement;
-          if (tileMatrix[by16(player.pos.y)][by16(player.pos.x)].solid === true) {
-            player.pos.x += movement;
-          }
         } else if (e.key === "ArrowUp") {
           player.pos.y -= movement;
-          if (tileMatrix[by16(player.pos.y)][by16(player.pos.x)].solid === true) {
-            player.pos.y += movement;
-          }
         } else if (e.key === "ArrowDown") {
           player.pos.y += movement;
-          if (tileMatrix[by16(player.pos.y)][by16(player.pos.x)].solid === true) {
-            player.pos.y -= movement;
-          }
+        }
+
+        // collision check
+        if (tileMatrix[by16(player.pos.y)][by16(player.pos.x + movement)].solid === true) {
+          player.pos.x -= movement;
+        }
+        if (tileMatrix[by16(player.pos.y)][by16(player.pos.x)].solid === true) {
+          player.pos.x += movement;
+        }
+        if (tileMatrix[by16(player.pos.y)][by16(player.pos.x)].solid === true) {
+          player.pos.y += movement;
+        }
+        if (tileMatrix[by16(player.pos.y + movement)][by16(player.pos.x)].solid === true) {
+          player.pos.y -= movement;
         }
       });
 

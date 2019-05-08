@@ -16,5 +16,12 @@
       "solid": true,
       "coords": [5, 5, 8, 8]
     }
+  ],
+  "entities": [
+    {
+      "tile": "chest",
+      "solid": true,
+      "coords": [240, 208]
+    }
   ]
 }

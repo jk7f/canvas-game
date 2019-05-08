@@ -12,6 +12,13 @@ export default class Spritesheet {
     buffer.height = this.height;
     buffer.getContext("2d").drawImage(this.image, x * this.width, y * this.height, this.width, this.height, 0, 0, this.width, this.height);
     this.tiles.set(name, buffer);
+
+    const flipped = buffer.cloneNode();
+    const flippedContext = flipped.getContext("2d");
+    flippedContext.scale(-1, 1);
+    flippedContext.translate(-this.width, 0);
+    flippedContext.drawImage(this.image, x * this.width, y * this.height, this.width, this.height, 0, 0, this.width, this.height);
+    this.tiles.set(name + "-flipped", flipped);
   }
 
   draw(name, context, x, y) {

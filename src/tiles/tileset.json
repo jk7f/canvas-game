@@ -9,6 +9,10 @@
     {
       "name": "floor",
       "tile": [1, 4]
+    },
+    {
+      "name": "chest",
+      "tile": [15, 13]
     }
   ]
 }

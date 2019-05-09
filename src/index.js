@@ -98,6 +98,20 @@ const main = async () => {
     renderBg(tileMatrix, spritesheet);
 
     entities.forEach(entity => {
+      entities.forEach(checkEntity => {
+        if (entity === checkEntity) {
+          return;
+        }
+
+        if (entity.bbox.collides(checkEntity.bbox)) {
+          console.log(`${entity.name} collided with ${checkEntity.name}`);
+          entity.collides(checkEntity);
+          checkEntity.collides(entity);
+        }
+      });
+    });
+
+    entities.forEach(entity => {
       entity.draw(context, Boolean(entity.direction.x));
     });
     lastTime = time;

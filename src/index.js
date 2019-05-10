@@ -2,6 +2,11 @@ import { loadImage, loadJson } from "./Loaders.js";
 import Spritesheet from "./Spritesheet.js";
 import Player from "./entities/Player.js";
 import Entity from "./Entity.js";
+import generateMap from "./mapGenerator.js";
+
+generateMap.then(map => {
+  console.log(map);
+});
 const canvas = document.querySelector("#canvas");
 const context = canvas.getContext("2d");
 const scale = window.devicePixelRatio || 1;

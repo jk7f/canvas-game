@@ -13,6 +13,10 @@
     {
       "name": "chest",
       "tile": [15, 13]
+    },
+    {
+      "name": "door",
+      "tile": [6, 9]
     }
   ]
 }

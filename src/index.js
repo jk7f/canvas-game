@@ -2,18 +2,16 @@ import { loadImage, loadJson } from "./Loaders.js";
 import Spritesheet from "./Spritesheet.js";
 import Player from "./entities/Player.js";
 import Entity from "./Entity.js";
-import generateMap from "./mapGenerator.js";
+import { generateMap, addDoorEntitiesToRoom } from "./mapGenerator.js";
 
-generateMap.then(map => {
-  console.log(map);
-});
 const canvas = document.querySelector("#canvas");
 const context = canvas.getContext("2d");
 const scale = window.devicePixelRatio || 1;
-
-canvas.setAttribute("style", `width:${canvas.getAttribute("width")}; height:${canvas.getAttribute("height")}`);
-canvas.width = canvas.getAttribute("width") * scale;
-canvas.height = canvas.getAttribute("height") * scale;
+const CANVAS_WIDTH = canvas.getAttribute("width");
+const CANVAS_HEIGHT = canvas.getAttribute("height");
+canvas.setAttribute("style", `width:${CANVAS_WIDTH}; height:${CANVAS_HEIGHT}`);
+canvas.width = CANVAS_WIDTH * scale;
+canvas.height = CANVAS_HEIGHT * scale;
 context.scale(scale, scale);
 
 const buildTileMatrix = level => {
@@ -40,33 +38,57 @@ const renderBg = (tileMatrix, spritesheet) => {
   });
 };
 
-const main = async () => {
-  const level = await loadJson("src/levels/01.json");
-  const tileset = await loadJson(level.tileset);
-  const spriteImage = await loadImage(tileset);
-  const spritesheet = new Spritesheet(spriteImage, tileset.size[0], tileset.size[1]);
-  const entities = [];
-
-  tileset.tiles.forEach(tile => {
-    spritesheet.define(tile.name, tile.tile[0], tile.tile[1]);
+const generateRooms = async level => {
+  const map = await generateMap;
+  const mapWithRooms = map.map(row => {
+    const rowWithRooms = row.map(col => {
+      if (col === 1) {
+        return level.roomTypes[Math.floor(Math.random() * level.roomTypes.length)];
+      } else {
+        return null;
+      }
+    });
+    return rowWithRooms;
   });
-  spritesheet.define("player", 8, 3);
-  const player = new Player(
-    "player",
-    {
-      x: 64,
-      y: 64
-    },
-    spritesheet
-  );
+  return mapWithRooms;
+};
 
-  entities.push(player);
-  const tileMatrix = buildTileMatrix(level);
-
-  level.entities.forEach(entity => {
-    entities.push(new Entity(entity.tile, { x: entity.coords[0], y: entity.coords[1] }, spritesheet));
+const setupRoom = (map, currentRoomIndex, spritesheet, onRoomChange, originSide = "left", player) => {
+  console.log(`setting up room: ${currentRoomIndex.join("-")}`);
+  const currentRoom = addDoorEntitiesToRoom(map, currentRoomIndex, spritesheet, CANVAS_WIDTH, CANVAS_HEIGHT, onRoomChange);
+  currentRoom.tileMatrix = buildTileMatrix(currentRoom);
+  currentRoom.initializedEntities = [];
+  currentRoom.entities.forEach(entity => {
+    // we already added the doors as entity, no need to readd
+    const isInstanceOfEntity = entity instanceof Entity;
+    if (isInstanceOfEntity === false) {
+      currentRoom.initializedEntities.push(new Entity(entity.tile, { x: entity.coords[0], y: entity.coords[1] }, spritesheet));
+    } else {
+      currentRoom.initializedEntities.push(entity);
+    }
   });
 
+  if (originSide === "top") {
+    //player emerges from the bottom
+    player.pos.x = CANVAS_WIDTH / 2;
+    player.pos.y = CANVAS_HEIGHT - 16;
+  } else if (originSide === "bottom") {
+    //player emerges from the top
+    player.pos.x = CANVAS_WIDTH / 2;
+    player.pos.y = 16;
+  } else if (originSide === "left") {
+    //player emerges from the right
+    player.pos.x = CANVAS_WIDTH - 16;
+    player.pos.y = CANVAS_HEIGHT / 2;
+  } else if (originSide === "right") {
+    //player emerges from the left
+    player.pos.x = 16;
+    player.pos.y = CANVAS_HEIGHT / 2;
+  }
+  return currentRoom;
+};
+
+const setupPlayerMovement = (player, tileMatrix) => {
   window.addEventListener("keydown", e => {
     const movement = 8;
     const playerSize = 12;
@@ -95,15 +117,56 @@ const main = async () => {
       player.pos = prevPos;
     }
   });
+};
+
+const setupTiles = (tileset, spritesheet) => {
+  tileset.tiles.forEach(tile => {
+    spritesheet.define(tile.name, tile.tile[0], tile.tile[1]);
+  });
+};
+
+const setupPlayer = spritesheet => {
+  spritesheet.define("player", 8, 3);
+  const player = new Player(
+    "player",
+    {
+      x: 64,
+      y: 64
+    },
+    spritesheet
+  );
+
+  return player;
+};
+
+const main = async () => {
+  const level = await loadJson("src/levels/01.json");
+  const map = await generateRooms(level);
+  console.log(map);
+  const tileset = await loadJson(level.tileset);
+  const spriteImage = await loadImage(tileset);
+  const spritesheet = new Spritesheet(spriteImage, tileset.size[0], tileset.size[1]);
+  const player = setupPlayer(spritesheet);
+  const onRoomChange = (roomIndex, originSide) => {
+    currentRoom = setupRoom(map, roomIndex, spritesheet, onRoomChange, originSide, player);
+  };
+  const currentRoomIndex = [4, 4];
+  setupTiles(tileset, spritesheet);
+  let currentRoom = setupRoom(map, currentRoomIndex, spritesheet, onRoomChange, player);
+  setupPlayerMovement(player, currentRoom.tileMatrix);
+  console.log(currentRoom);
+
+  currentRoom.initializedEntities.push(player);
 
   let lastTime = 0;
   const render = (time = 0) => {
     const deltaTime = time - lastTime;
+    const { initializedEntities, tileMatrix } = currentRoom;
     context.clearRect(0, 0, context.width, context.height);
     renderBg(tileMatrix, spritesheet);
 
-    entities.forEach(entity => {
-      entities.forEach(checkEntity => {
+    initializedEntities.forEach(entity => {
+      initializedEntities.forEach(checkEntity => {
         if (entity === checkEntity) {
           return;
         }
@@ -116,7 +179,7 @@ const main = async () => {
       });
     });
 
-    entities.forEach(entity => {
+    initializedEntities.forEach(entity => {
       entity.draw(context, Boolean(entity.direction.x));
     });
     lastTime = time;

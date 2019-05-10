@@ -1,27 +1,56 @@
 {
   "tileset": "src/tiles/tileset.json",
-  "layers": [
+  "roomTypes": [
     {
-      "tile": "wall",
-      "solid": true,
-      "coords": [0, 0, 16, 20]
+      "layers": [
+        {
+          "tile": "wall",
+          "solid": true,
+          "coords": [0, 0, 8, 20]
+        },
+        {
+          "tile": "wall",
+          "solid": true,
+          "coords": [9, 0, 16, 20]
+        },
+        {
+          "tile": "floor",
+          "solid": false,
+          "coords": [1, 1, 15, 19]
+        },
+        {
+          "tile": "wall",
+          "solid": true,
+          "coords": [5, 5, 8, 8]
+        }
+      ],
+      "entities": [
+        {
+          "tile": "chest",
+          "solid": true,
+          "coords": [240, 208]
+        }
+      ]
     },
     {
-      "tile": "floor",
-      "solid": false,
-      "coords": [1, 1, 15, 19]
-    },
-    {
-      "tile": "wall",
-      "solid": true,
-      "coords": [5, 5, 8, 8]
-    }
-  ],
-  "entities": [
-    {
-      "tile": "chest",
-      "solid": true,
-      "coords": [240, 208]
+      "layers": [
+        {
+          "tile": "wall",
+          "solid": true,
+          "coords": [0, 0, 8, 20]
+        },
+        {
+          "tile": "wall",
+          "solid": true,
+          "coords": [9, 0, 16, 20]
+        },
+        {
+          "tile": "floor",
+          "solid": false,
+          "coords": [1, 1, 15, 19]
+        }
+      ],
+      "entities": []
     }
   ]
 }

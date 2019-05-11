@@ -6,12 +6,7 @@
         {
           "tile": "wall",
           "solid": true,
-          "coords": [0, 0, 8, 20]
-        },
-        {
-          "tile": "wall",
-          "solid": true,
-          "coords": [9, 0, 16, 20]
+          "coords": [0, 0, 16, 20]
         },
         {
           "tile": "floor",
@@ -37,12 +32,7 @@
         {
           "tile": "wall",
           "solid": true,
-          "coords": [0, 0, 8, 20]
-        },
-        {
-          "tile": "wall",
-          "solid": true,
-          "coords": [9, 0, 16, 20]
+          "coords": [0, 0, 16, 20]
         },
         {
           "tile": "floor",

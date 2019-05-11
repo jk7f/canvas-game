@@ -25,6 +25,6 @@ export default class Entity {
   collides(them) {}
 
   draw(context, flipped = false) {
-    this.spritesheet.draw(flipped ? this.name + "-flipped" : this.name, context, this.pos.x, this.pos.y);
+    this.spritesheet.draw(flipped ? this.name + "-flipped" : this.name, context, 0, 0);
   }
 }

@@ -1,4 +1,5 @@
 import Door from "./entities/Door.js";
+import Entity from "./Entity.js";
 
 const cleanUpEmptyRowsAndCols = inputArr => {
   // get rid of all rows which are full of 0s
@@ -85,73 +86,167 @@ export const generateMap = new Promise((resolve, reject) => {
   loop();
 });
 
-export const addDoorEntitiesToRoom = (map, index, spritesheet, width, height, onRoomChange) => {
-  const room = map[index[0]][index[1]];
+export const addDoorEntitiesToRooms = (map, spritesheet, width, height, onRoomChange) => {
+  map.forEach((row, rowIndex) => {
+    row.forEach((col, colIndex) => {
+      if (!col) {
+        return;
+      }
+      // top
+      if (rowIndex > 0 && map[rowIndex - 1][colIndex]) {
+        col.entities.push(
+          new Door(
+            "door",
+            {
+              x: width / 2,
+              y: 0
+            },
+            spritesheet,
+            [rowIndex - 1, colIndex],
+            onRoomChange,
+            "top"
+          )
+        );
+      }
+      // bottom
+      if (rowIndex < map.length - 1 && map[rowIndex + 1][colIndex]) {
+        col.entities.push(
+          new Door(
+            "door",
+            {
+              x: width / 2,
+              y: height - 16
+            },
+            spritesheet,
+            [rowIndex + 1, colIndex],
+            onRoomChange,
+            "bottom"
+          )
+        );
+      }
+      // left
+      if (colIndex > 0 && map[rowIndex][colIndex - 1]) {
+        col.entities.push(
+          new Door(
+            "door",
+            {
+              x: 0,
+              y: height / 2
+            },
+            spritesheet,
+            [rowIndex, colIndex - 1],
+            onRoomChange,
+            "left"
+          )
+        );
+      }
+      // right
+      if (colIndex < row.length - 1 && map[rowIndex][colIndex + 1]) {
+        col.entities.push(
+          new Door(
+            "door",
+            {
+              x: width - 16,
+              y: height / 2
+            },
+            spritesheet,
+            [rowIndex, colIndex + 1],
+            onRoomChange,
+            "right"
+          )
+        );
+      }
+    });
+  });
 
-  // top
-  if (map[index[0] - 1][index[1]]) {
-    room.entities.push(
-      new Door(
-        "door",
-        {
-          x: width / 2,
-          y: 0
-        },
-        spritesheet,
-        [index[0] - 1, index[1]],
-        onRoomChange,
-        "top"
-      )
-    );
-  }
-  // bottom
-  if (map[index[0] + 1][index[1]]) {
-    room.entities.push(
-      new Door(
-        "door",
-        {
-          x: width / 2,
-          y: height - 16
-        },
-        spritesheet,
-        [index[0] + 1, index[1]],
-        onRoomChange,
-        "bottom"
-      )
-    );
-  }
-  // left
-  if (map[index[0]][index[1] - 1]) {
-    room.entities.push(
-      new Door(
-        "door",
-        {
-          x: 0,
-          y: height / 2
-        },
-        spritesheet,
-        [index[0], index[1] - 1],
-        onRoomChange,
-        "left"
-      )
-    );
-  }
-  // right
-  if (map[index[0]][index[1] + 1]) {
-    room.entities.push(
-      new Door(
-        "door",
-        {
-          x: width - 16,
-          y: height / 2
-        },
-        spritesheet,
-        [index[0], index[1] + 1],
-        onRoomChange,
-        "right"
-      )
-    );
-  }
+  return map;
+};
 
-  return room;
+export const generateRooms = async level => {
+  const map = await generateMap;
+  const mapWithRooms = map.map(row => {
+    const rowWithRooms = row.map(col => {
+      if (col === 1) {
+        return JSON.parse(JSON.stringify(level.roomTypes[Math.floor(Math.random() * level.roomTypes.length)]));
+      } else {
+        return null;
+      }
+    });
+    return rowWithRooms;
+  });
+  return mapWithRooms;
+};
+
+export const setupRooms = (map, spritesheet, onRoomChange, player, canvas) => {
+  const world = {};
+  world.rooms = addDoorEntitiesToRooms(map, spritesheet, canvas.width, canvas.height, onRoomChange);
+  world.tileMatrix = buildTileMatrix(world.rooms);
+  world.rooms.forEach(row => {
+    row.forEach(col => {
+      if (!col) {
+        return;
+      }
+      col.initializedEntities = [];
+      col.entities.forEach(entity => {
+        // we already added the doors as entity, no need to readd
+        const isInstanceOfEntity = entity instanceof Entity;
+        if (isInstanceOfEntity === false) {
+          col.initializedEntities.push(new Entity(entity.tile, { x: entity.coords[0], y: entity.coords[1] }, spritesheet));
+        } else {
+          col.initializedEntities.push(entity);
+        }
+      });
+    });
+  });
+  world.globalEntities = [];
+  world.globalEntities.push(player);
+  return world;
+};
+
+const buildTileMatrix = level => {
+  const tileMatrix = [];
+  level.forEach((row, rowIndex) => {
+    row.forEach((col, colIndex) => {
+      if (!col) {
+        for (let y = rowIndex * 16; y < rowIndex * 16 + 16; y++) {
+          for (let x = colIndex * 16; x < colIndex * 20 + 20; x++) {
+            if (!Array.isArray(tileMatrix[y])) {
+              tileMatrix[y] = [];
+            }
+            tileMatrix[y][x] = null;
+          }
+        }
+        return;
+      }
+      col.layers.forEach(layer => {
+        const [top, left, bottom, right] = layer.coords;
+        for (let x = left; x < right; x++) {
+          for (let y = top; y < bottom; y++) {
+            if (!Array.isArray(tileMatrix[y + rowIndex * 16])) {
+              tileMatrix[y + rowIndex * 16] = [];
+            }
+            tileMatrix[y + rowIndex * 16][x + colIndex * 20] = JSON.parse(JSON.stringify(layer));
+          }
+        }
+      });
+      col.entities.forEach(entity => {
+        if (entity.name === "door") {
+          if (entity.side === "top") {
+            tileMatrix[rowIndex * 16][10 + colIndex * 20].tile = "floor";
+            tileMatrix[rowIndex * 16][10 + colIndex * 20].solid = false;
+          } else if (entity.side === "bottom") {
+            tileMatrix[15 + rowIndex * 16][10 + colIndex * 20].tile = "floor";
+            tileMatrix[15 + rowIndex * 16][10 + colIndex * 20].solid = false;
+          } else if (entity.side === "left") {
+            tileMatrix[8 + rowIndex * 16][colIndex * 20].tile = "floor";
+            tileMatrix[8 + rowIndex * 16][colIndex * 20].solid = false;
+          } else if (entity.side === "right") {
+            tileMatrix[8 + rowIndex * 16][19 + colIndex * 20].tile = "floor";
+            tileMatrix[8 + rowIndex * 16][19 + colIndex * 20].solid = false;
+          }
+        }
+      });
+    });
+  });
+  return tileMatrix;
 };

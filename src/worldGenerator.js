@@ -109,7 +109,7 @@ const addDoorEntitiesToRooms = (roomsMatrix, spritesheet, width, height, onRoomC
         );
       }
       // bottom
-      if (rowIndex < roomsMatrix.length - 1 && roomsMatrix[rowIndex + 1][colIndex]) {
+      if (rowIndex < roomsMatrix.length - 2 && roomsMatrix[rowIndex + 1][colIndex]) {
         col.entities.push(
           new Door(
             "door",
@@ -213,14 +213,6 @@ const buildTileMatrix = level => {
   level.forEach((row, rowIndex) => {
     row.forEach((col, colIndex) => {
       if (!col) {
-        for (let y = rowIndex * 16; y < rowIndex * 16 + 16; y++) {
-          for (let x = colIndex * 16; x < colIndex * 20 + 20; x++) {
-            if (!Array.isArray(tileMatrix[y])) {
-              tileMatrix[y] = [];
-            }
-            tileMatrix[y][x] = null;
-          }
-        }
         return;
       }
       col.layers.forEach(layer => {

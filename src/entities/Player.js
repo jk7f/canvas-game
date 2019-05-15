@@ -1,4 +1,5 @@
 import Entity from "../Entity.js";
+import { getTile } from "../utils.js";
 
 export default class Player extends Entity {
   constructor() {
@@ -19,7 +20,6 @@ export default class Player extends Entity {
   }
 
   move(tileMatrix, deltaTime = 16) {
-    const by16 = coord => Math.floor(coord / 16);
     const playerSize = 12;
     const prevPos = {};
     const { pos, keyState, moveSpeed, direction } = this;
@@ -41,10 +41,10 @@ export default class Player extends Entity {
 
     // collision check
     if (
-      tileMatrix[by16(this.pos.y + playerSize)][by16(this.pos.x + playerSize)].solid === true ||
-      tileMatrix[by16(this.pos.y + playerSize)][by16(this.pos.x)].solid === true ||
-      tileMatrix[by16(this.pos.y)][by16(this.pos.x + playerSize)].solid === true ||
-      tileMatrix[by16(this.pos.y)][by16(this.pos.x)].solid === true
+      tileMatrix[getTile(this.pos.y + playerSize)][getTile(this.pos.x + playerSize)].solid === true ||
+      tileMatrix[getTile(this.pos.y + playerSize)][getTile(this.pos.x)].solid === true ||
+      tileMatrix[getTile(this.pos.y)][getTile(this.pos.x + playerSize)].solid === true ||
+      tileMatrix[getTile(this.pos.y)][getTile(this.pos.x)].solid === true
     ) {
       this.pos = prevPos;
     }

@@ -1,3 +1,5 @@
+import { getTile } from "./utils.js";
+
 const createBackgroundLayer = (width, height, tiles, sprites) => {
   const buffer = document.createElement("canvas");
   buffer.width = width;
@@ -6,7 +8,6 @@ const createBackgroundLayer = (width, height, tiles, sprites) => {
 
   const render = (camera, topLevelCanvasContext) => {
     context.clearRect(0, 0, buffer.width, buffer.height);
-    const getTile = coord => Math.floor(coord / 16);
     const cameraX16 = getTile(camera.pos.x);
     const cameraY16 = getTile(camera.pos.y);
     for (let startX = cameraX16; startX < cameraX16 + getTile(camera.size.x); startX++) {
@@ -19,7 +20,6 @@ const createBackgroundLayer = (width, height, tiles, sprites) => {
         }
       }
     }
-
     topLevelCanvasContext.drawImage(buffer, -camera.pos.x % 16, -camera.pos.y % 16);
   };
   return render;

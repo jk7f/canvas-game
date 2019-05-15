@@ -70,7 +70,7 @@ const main = async () => {
     canvas.context.clearRect(0, 0, canvas.context.width, canvas.context.height);
     player.move(world.tileMatrix, deltaTime);
 
-    camera.update(player);
+    camera.update(player, deltaTime);
 
     renderBackground(camera, canvas.context);
     renderSprites(camera, canvas.context);

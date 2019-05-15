@@ -1,3 +1,5 @@
+const lerp = (from, to, multiplier = 0.1) => (1 - multiplier) * from + multiplier * to;
+
 export default class Camera {
   constructor() {
     this.pos = {
@@ -8,7 +10,7 @@ export default class Camera {
   }
 
   update(player) {
-    this.pos.x = Math.floor(player.pos.x / this.size.x) * this.size.x;
-    this.pos.y = Math.floor(player.pos.y / this.size.y) * this.size.y;
+    this.pos.x = lerp(this.pos.x, Math.floor(player.pos.x / this.size.x) * this.size.x);
+    this.pos.y = lerp(this.pos.y, Math.floor(player.pos.y / this.size.y) * this.size.y);
   }
 }

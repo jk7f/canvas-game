@@ -6,4 +6,9 @@ export default class Camera {
     };
     this.size = { x: 320, y: 256 };
   }
+
+  update(player) {
+    this.pos.x = Math.floor(player.pos.x / this.size.x) * this.size.x;
+    this.pos.y = Math.floor(player.pos.y / this.size.y) * this.size.y;
+  }
 }

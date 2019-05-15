@@ -51,7 +51,7 @@ const generateStartingMatrix = size => {
   return matrix;
 };
 
-export const generateMap = new Promise((resolve, reject) => {
+const generateRoomMatrix = new Promise((resolve, reject) => {
   const TILESCOUNT = 40;
   const matrix = generateStartingMatrix(TILESCOUNT);
 
@@ -86,14 +86,14 @@ export const generateMap = new Promise((resolve, reject) => {
   loop();
 });
 
-export const addDoorEntitiesToRooms = (map, spritesheet, width, height, onRoomChange) => {
-  map.forEach((row, rowIndex) => {
+const addDoorEntitiesToRooms = (roomsMatrix, spritesheet, width, height, onRoomChange) => {
+  roomsMatrix.forEach((row, rowIndex) => {
     row.forEach((col, colIndex) => {
       if (!col) {
         return;
       }
       // top
-      if (rowIndex > 0 && map[rowIndex - 1][colIndex]) {
+      if (rowIndex > 0 && roomsMatrix[rowIndex - 1][colIndex]) {
         col.entities.push(
           new Door(
             "door",
@@ -109,7 +109,7 @@ export const addDoorEntitiesToRooms = (map, spritesheet, width, height, onRoomCh
         );
       }
       // bottom
-      if (rowIndex < map.length - 1 && map[rowIndex + 1][colIndex]) {
+      if (rowIndex < roomsMatrix.length - 1 && roomsMatrix[rowIndex + 1][colIndex]) {
         col.entities.push(
           new Door(
             "door",
@@ -125,7 +125,7 @@ export const addDoorEntitiesToRooms = (map, spritesheet, width, height, onRoomCh
         );
       }
       // left
-      if (colIndex > 0 && map[rowIndex][colIndex - 1]) {
+      if (colIndex > 0 && roomsMatrix[rowIndex][colIndex - 1]) {
         col.entities.push(
           new Door(
             "door",
@@ -141,7 +141,7 @@ export const addDoorEntitiesToRooms = (map, spritesheet, width, height, onRoomCh
         );
       }
       // right
-      if (colIndex < row.length - 1 && map[rowIndex][colIndex + 1]) {
+      if (colIndex < row.length - 1 && roomsMatrix[rowIndex][colIndex + 1]) {
         col.entities.push(
           new Door(
             "door",
@@ -159,12 +159,12 @@ export const addDoorEntitiesToRooms = (map, spritesheet, width, height, onRoomCh
     });
   });
 
-  return map;
+  return roomsMatrix;
 };
 
-export const generateRooms = async level => {
-  const map = await generateMap;
-  const mapWithRooms = map.map(row => {
+const generateRooms = async level => {
+  const matrix = await generateRoomMatrix;
+  const matrixWithRooms = matrix.map(row => {
     const rowWithRooms = row.map(col => {
       if (col === 1) {
         return JSON.parse(JSON.stringify(level.roomTypes[Math.floor(Math.random() * level.roomTypes.length)]));
@@ -174,14 +174,11 @@ export const generateRooms = async level => {
     });
     return rowWithRooms;
   });
-  return mapWithRooms;
+  return matrixWithRooms;
 };
 
-export const setupRooms = (map, spritesheet, onRoomChange, player, canvas) => {
-  const world = {};
-  world.rooms = addDoorEntitiesToRooms(map, spritesheet, canvas.width, canvas.height, onRoomChange);
-  world.tileMatrix = buildTileMatrix(world.rooms);
-  world.rooms.forEach(row => {
+const initializeEntities = (rooms, spritesheet) => {
+  rooms.forEach(row => {
     row.forEach(col => {
       if (!col) {
         return;
@@ -198,6 +195,14 @@ export const setupRooms = (map, spritesheet, onRoomChange, player, canvas) => {
       });
     });
   });
+  return rooms;
+};
+
+export const setupWorld = async (level, spritesheet, onRoomChange, player, canvas) => {
+  const world = {};
+  world.rooms = addDoorEntitiesToRooms(await generateRooms(level), spritesheet, canvas.width, canvas.height, onRoomChange);
+  world.tileMatrix = buildTileMatrix(world.rooms);
+  initializeEntities(world.rooms, spritesheet);
   world.globalEntities = [];
   world.globalEntities.push(player);
   return world;

@@ -1,10 +1,10 @@
-const createBackground = (width, height, tiles, sprites) => {
+const createBackgroundLayer = (width, height, tiles, sprites) => {
   const buffer = document.createElement("canvas");
   buffer.width = width;
   buffer.height = height;
   const context = buffer.getContext("2d");
 
-  const render = (camera, canvasContext) => {
+  const render = (camera, topLevelCanvasContext) => {
     context.clearRect(0, 0, buffer.width, buffer.height);
     const getTile = coord => Math.floor(coord / 16);
     const cameraX16 = getTile(camera.pos.x);
@@ -20,9 +20,9 @@ const createBackground = (width, height, tiles, sprites) => {
       }
     }
 
-    canvasContext.drawImage(buffer, -camera.pos.x % 16, -camera.pos.y % 16);
+    topLevelCanvasContext.drawImage(buffer, -camera.pos.x % 16, -camera.pos.y % 16);
   };
   return render;
 };
 
-export default createBackground;
+export default createBackgroundLayer;

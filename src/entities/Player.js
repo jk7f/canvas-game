@@ -47,6 +47,8 @@ export default class Player extends Entity {
       tileMatrix[getTile(this.pos.y)][getTile(this.pos.x)].solid === true
     ) {
       this.pos = prevPos;
+    } else {
+      this.bbox.pos = pos;
     }
   }
 }

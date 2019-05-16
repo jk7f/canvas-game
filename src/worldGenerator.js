@@ -178,8 +178,8 @@ const generateRooms = async level => {
 };
 
 const initializeEntities = (rooms, spritesheet) => {
-  rooms.forEach(row => {
-    row.forEach(col => {
+  rooms.forEach((row, rowIndex) => {
+    row.forEach((col, colIndex) => {
       if (!col) {
         return;
       }
@@ -187,9 +187,15 @@ const initializeEntities = (rooms, spritesheet) => {
       col.entities.forEach(entity => {
         // we already added the doors as entity, no need to readd
         const isInstanceOfEntity = entity instanceof Entity;
+        const offsetX = colIndex * 20 * 16;
+        const offsetY = rowIndex * 16 * 16;
         if (isInstanceOfEntity === false) {
-          col.initializedEntities.push(new Entity(entity.tile, { x: entity.coords[0], y: entity.coords[1] }, spritesheet));
+          col.initializedEntities.push(
+            new Entity(entity.tile, { x: entity.coords[0] + offsetX, y: entity.coords[1] + offsetY }, spritesheet)
+          );
         } else {
+          entity.pos.x += offsetX;
+          entity.pos.y += offsetY;
           col.initializedEntities.push(entity);
         }
       });
@@ -210,6 +216,11 @@ export const setupWorld = async (level, spritesheet, onRoomChange, player, canva
 
 const buildTileMatrix = level => {
   const tileMatrix = [];
+  const addFloorTile = (row, col) => {
+    const subject = tileMatrix[row][col];
+    subject.tile = "floor";
+    subject.solid = false;
+  };
   level.forEach((row, rowIndex) => {
     row.forEach((col, colIndex) => {
       if (!col) {
@@ -229,17 +240,13 @@ const buildTileMatrix = level => {
       col.entities.forEach(entity => {
         if (entity.name === "door") {
           if (entity.side === "top") {
-            tileMatrix[rowIndex * 16][10 + colIndex * 20].tile = "floor";
-            tileMatrix[rowIndex * 16][10 + colIndex * 20].solid = false;
+            addFloorTile(rowIndex * 16, 10 + colIndex * 20);
           } else if (entity.side === "bottom") {
-            tileMatrix[15 + rowIndex * 16][10 + colIndex * 20].tile = "floor";
-            tileMatrix[15 + rowIndex * 16][10 + colIndex * 20].solid = false;
+            addFloorTile(15 + rowIndex * 16, 10 + colIndex * 20);
           } else if (entity.side === "left") {
-            tileMatrix[8 + rowIndex * 16][colIndex * 20].tile = "floor";
-            tileMatrix[8 + rowIndex * 16][colIndex * 20].solid = false;
+            addFloorTile(8 + rowIndex * 16, colIndex * 20);
           } else if (entity.side === "right") {
-            tileMatrix[8 + rowIndex * 16][19 + colIndex * 20].tile = "floor";
-            tileMatrix[8 + rowIndex * 16][19 + colIndex * 20].solid = false;
+            addFloorTile(8 + rowIndex * 16, 19 + colIndex * 20);
           }
         }
       });

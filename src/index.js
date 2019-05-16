@@ -47,6 +47,34 @@ const setupPlayer = (spritesheet, canvas) => {
   return player;
 };
 
+const checkForSpriteCollisions = (currentRoom, player) => {
+  // console.log(player.pos);
+  // console.log(player.bbox.pos);
+  const { initializedEntities } = currentRoom;
+  initializedEntities.forEach(entity => {
+    initializedEntities.forEach(checkEntity => {
+      if (entity === checkEntity) {
+        return;
+      }
+      if (entity.bbox.collides(checkEntity.bbox)) {
+        console.log(`${entity.name} collided with ${checkEntity.name}`);
+        entity.collides(checkEntity);
+        checkEntity.collides(entity);
+      }
+    });
+
+    if (entity.bbox.collides(player.bbox)) {
+      console.log(`${entity.name} collided with player`);
+      entity.collides(player);
+      player.collides(entity);
+    }
+  });
+
+  // initializedEntities.forEach(entity => {
+  // 	entity.draw(context, Boolean(entity.direction.x));
+  // });
+};
+
 const main = async () => {
   const camera = new Camera();
   const canvas = new Canvas();
@@ -66,31 +94,17 @@ const main = async () => {
 
   const render = (time = 0) => {
     const deltaTime = time - lastTime;
-    const { initializedEntities, globalEntities } = world;
+    const { rooms, globalEntities } = world;
+    const currentRoom = world.rooms[Math.floor(player.pos.y / canvas.height)][Math.floor(player.pos.x / canvas.width)];
     canvas.context.clearRect(0, 0, canvas.context.width, canvas.context.height);
     player.move(world.tileMatrix, deltaTime);
 
     camera.update(player, deltaTime);
-
     renderBackground(camera, canvas.context);
     renderSprites(camera, canvas.context);
 
-    // initializedEntities.forEach(entity => {
-    //   initializedEntities.forEach(checkEntity => {
-    //     if (entity === checkEntity) {
-    //       return;
-    //     }
-    //     if (entity.bbox.collides(checkEntity.bbox)) {
-    //       console.log(`${entity.name} collided with ${checkEntity.name}`);
-    //       entity.collides(checkEntity);
-    //       checkEntity.collides(entity);
-    //     }
-    //   });
-    // });
+    checkForSpriteCollisions(currentRoom, player);
 
-    // initializedEntities.forEach(entity => {
-    //   entity.draw(context, Boolean(entity.direction.x));
-    // });
     lastTime = time;
     window.requestAnimationFrame(render);
   };

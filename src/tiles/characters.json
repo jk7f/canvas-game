@@ -1,0 +1,10 @@
+{
+  "url": "src/img/Dungeon_Character.png",
+  "size": [16, 16],
+  "tiles": [
+    {
+      "name": "player",
+      "tile": [1, 2]
+    }
+  ]
+}

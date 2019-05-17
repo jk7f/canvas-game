@@ -1,10 +1,11 @@
-import createBackgroundLayer from "./Background.js";
+import createBackgroundLayer from "./layers/Background.js";
+import createUiLayer from "./layers/UserInterface.js";
 import Camera from "./Camera.js";
 import Canvas from "./Canvas.js";
 import Player from "./entities/Player.js";
 import { loadImage, loadJson } from "./loaders.js";
 import { setupWorld } from "./worldGenerator.js";
-import createSpriteLayer from "./Sprites.js";
+import createSpriteLayer from "./layers/Sprites.js";
 import Spritesheet from "./Spritesheet.js";
 
 const setupPlayerMovement = player => {
@@ -28,7 +29,13 @@ const setupPlayerMovement = player => {
 
 const defineTiles = (tileset, spritesheet) => {
   tileset.tiles.forEach(tile => {
-    spritesheet.define(tile.name, tile.tile[0], tile.tile[1]);
+    if (tile.tiles) {
+      tile.tiles.forEach((tileVariant, index) => {
+        spritesheet.define(`${tile.name}-${index}`, tileVariant[0], tileVariant[1]);
+      });
+    } else {
+      spritesheet.define(tile.name, tile.tile[0], tile.tile[1]);
+    }
   });
   spritesheet.define("empty", 1, 12);
 };
@@ -79,14 +86,18 @@ const main = async () => {
   const camera = new Camera();
   const canvas = new Canvas();
   const level = await loadJson("src/levels/01.json");
-  const tileset = await loadJson(level.tileset);
-  const spritesheet = new Spritesheet(await loadImage(tileset), tileset.size[0], tileset.size[1]);
-  const player = setupPlayer(spritesheet, canvas);
+  const levelTileset = await loadJson(level.tileset);
+  const entityTileset = await loadJson("src/tiles/characters.json");
+  const levelSpritesheet = new Spritesheet(await loadImage(levelTileset), levelTileset.size[0], levelTileset.size[1]);
+  const entitySpritesheet = new Spritesheet(await loadImage(entityTileset), entityTileset.size[0], entityTileset.size[1]);
+  const player = setupPlayer(entitySpritesheet, canvas);
   const onRoomChange = (roomIndex, originSide = "left") => {};
-  defineTiles(tileset, spritesheet);
-  const world = await setupWorld(level, spritesheet, onRoomChange, player, canvas);
-  const renderBackground = createBackgroundLayer(canvas.width, canvas.height, world.tileMatrix, spritesheet);
+  defineTiles(levelTileset, levelSpritesheet);
+  defineTiles(entityTileset, entitySpritesheet);
+  const world = await setupWorld(level, levelSpritesheet, onRoomChange, player, canvas);
+  const renderBackground = createBackgroundLayer(canvas.width, canvas.height, world.tileMatrix, levelSpritesheet);
   const renderSprites = createSpriteLayer(world.globalEntities);
+  const renderUi = createUiLayer();
   console.log(world);
   setupPlayerMovement(player, world.tileMatrix);
 
@@ -101,8 +112,8 @@ const main = async () => {
 
     camera.update(player, deltaTime);
     renderBackground(camera, canvas.context);
-    renderSprites(camera, canvas.context);
-
+    renderSprites(camera, canvas.context, currentRoom.initializedEntities);
+    renderUi(canvas.context, player);
     checkForSpriteCollisions(currentRoom, player);
 
     lastTime = time;

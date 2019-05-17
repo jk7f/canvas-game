@@ -5,6 +5,7 @@ export default class Player extends Entity {
   constructor() {
     super(...arguments);
     this.moveSpeed = 1.5;
+    this.score = 0;
     this.keyState = {
       up: false,
       down: false,
@@ -13,10 +14,11 @@ export default class Player extends Entity {
     };
   }
 
-  collides(them) {
-    if (them.name === "chest") {
-      alert("you hit the chest");
-    }
+  collides(them) {}
+
+  addScore(amount) {
+    this.score += amount;
+    console.log(this.score);
   }
 
   move(tileMatrix, deltaTime = 16) {

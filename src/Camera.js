@@ -10,7 +10,10 @@ export default class Camera {
   }
 
   update(player) {
-    this.pos.x = lerp(this.pos.x, Math.floor(player.pos.x / this.size.x) * this.size.x);
-    this.pos.y = lerp(this.pos.y, Math.floor(player.pos.y / this.size.y) * this.size.y);
+    const xGoal = Math.floor(player.pos.x / this.size.x) * this.size.x;
+    const yGoal = Math.floor(player.pos.y / this.size.y) * this.size.y;
+
+    this.pos.x = lerp(this.pos.x, xGoal);
+    this.pos.y = lerp(this.pos.y, yGoal);
   }
 }

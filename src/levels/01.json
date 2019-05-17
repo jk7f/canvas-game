@@ -1,22 +1,107 @@
 {
-  "tileset": "src/tiles/tileset.json",
+  "tileset": "src/tiles/dungeon.json",
+  "patterns": {
+    "base-room": [
+      {
+        "tile": "wallTop",
+        "solid": true,
+        "coords": [0, 0, 1, 20]
+      },
+      {
+        "tile": "wallLeft",
+        "solid": true,
+        "coords": [0, 0, 16, 1]
+      },
+      {
+        "tile": "wallBottom",
+        "solid": true,
+        "coords": [15, 0, 16, 20]
+      },
+      {
+        "tile": "wallRight",
+        "solid": true,
+        "coords": [0, 19, 16, 20]
+      },
+      {
+        "tile": "wallCornerTopRight",
+        "solid": true,
+        "coords": [0, 0, 1, 1]
+      },
+      {
+        "tile": "wallCornerTopLeft",
+        "solid": true,
+        "coords": [0, 19, 1, 20]
+      },
+      {
+        "tile": "wallCornerBottomRight",
+        "solid": true,
+        "coords": [15, 0, 16, 1]
+      },
+      {
+        "tile": "wallCornerBottomLeft",
+        "solid": true,
+        "coords": [15, 19, 16, 20]
+      },
+      {
+        "tile": "floor",
+        "variants": 12,
+        "solid": false,
+        "coords": [1, 1, 15, 19]
+      }
+    ],
+    "block-3x3": [
+      {
+        "tile": "wallBottom",
+        "solid": true,
+        "coords": [2, 1, 3, 2]
+      },
+      {
+        "tile": "wallLeft",
+        "solid": true,
+        "coords": [0, 0, 3, 1]
+      },
+      {
+        "tile": "wallTop",
+        "solid": true,
+        "coords": [0, 1, 1, 2]
+      },
+      {
+        "tile": "wallRight",
+        "solid": true,
+        "coords": [1, 2, 2, 3]
+      },
+      {
+        "tile": "wallCornerTopRight",
+        "solid": true,
+        "coords": [0, 0, 1, 1]
+      },
+      {
+        "tile": "wallCornerTopLeft",
+        "solid": true,
+        "coords": [0, 2, 1, 3]
+      },
+      {
+        "tile": "wallCornerBottomRight",
+        "solid": true,
+        "coords": [2, 0, 3, 1]
+      },
+      {
+        "tile": "wallCornerBottomLeft",
+        "solid": true,
+        "coords": [2, 2, 3, 3]
+      }
+    ]
+  },
   "roomTypes": [
     {
       "layers": [
         {
-          "tile": "wall",
-          "solid": true,
-          "coords": [0, 0, 16, 20]
+          "pattern": "base-room",
+          "coords": [0, 0]
         },
         {
-          "tile": "floor",
-          "solid": false,
-          "coords": [1, 1, 15, 19]
-        },
-        {
-          "tile": "wall",
-          "solid": true,
-          "coords": [5, 5, 8, 8]
+          "pattern": "block-3x3",
+          "coords": [2, 2]
         }
       ],
       "entities": [
@@ -30,14 +115,8 @@
     {
       "layers": [
         {
-          "tile": "wall",
-          "solid": true,
-          "coords": [0, 0, 16, 20]
-        },
-        {
-          "tile": "floor",
-          "solid": false,
-          "coords": [1, 1, 15, 19]
+          "pattern": "base-room",
+          "coords": [0, 0]
         }
       ],
       "entities": []

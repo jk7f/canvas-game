@@ -18,7 +18,6 @@ export default class Player extends Entity {
 
   addScore(amount) {
     this.score += amount;
-    console.log(this.score);
   }
 
   move(tileMatrix, deltaTime = 16) {

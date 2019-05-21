@@ -1,7 +1,7 @@
 import Entity from "../Entity.js";
 
 export default class Chest extends Entity {
-  constructor(name, pos, spritesheet, connection, onRoomChange, side) {
+  constructor(name, pos, spritesheet) {
     super(name, pos, spritesheet);
     this.pickedUp = false;
   }

@@ -11,8 +11,6 @@ export default class Door extends Entity {
   collides(them) {
     if (them.name === "player") {
       console.log(`entering room: ${this.connection.join("-")}`);
-      // this.onRoomChange(this.connection, this.side);
-      // alert("you hit the door");
     }
   }
 }

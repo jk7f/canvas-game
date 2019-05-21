@@ -1,4 +1,4 @@
-const lerp = (from, to, multiplier = 0.1) => (1 - multiplier) * from + multiplier * to;
+import { lerp } from "./utils.js";
 
 export default class Camera {
   constructor() {

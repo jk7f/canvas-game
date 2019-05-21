@@ -4,8 +4,8 @@ export default class BoundingBox {
     this.size = size;
   }
 
-  collides(collider) {
-    return this.bottom > collider.top && this.top < collider.bottom && this.left < collider.right && this.right > collider.left;
+  collides(them) {
+    return this.bottom > them.top && this.top < them.bottom && this.left < them.right && this.right > them.left;
   }
 
   get bottom() {

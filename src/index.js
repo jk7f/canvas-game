@@ -55,8 +55,6 @@ const setupPlayer = (spritesheet, canvas) => {
 };
 
 const checkForSpriteCollisions = (currentRoom, player) => {
-  // console.log(player.pos);
-  // console.log(player.bbox.pos);
   const { initializedEntities } = currentRoom;
   initializedEntities.forEach(entity => {
     initializedEntities.forEach(checkEntity => {
@@ -76,10 +74,6 @@ const checkForSpriteCollisions = (currentRoom, player) => {
       player.collides(entity);
     }
   });
-
-  // initializedEntities.forEach(entity => {
-  // 	entity.draw(context, Boolean(entity.direction.x));
-  // });
 };
 
 const main = async () => {

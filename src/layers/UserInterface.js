@@ -8,9 +8,9 @@ const createUiLayer = (width = 64, height = 64) => {
   uiBufferContext.textAlign = "right";
 
   const drawUiLayer = (context, player) => {
-    // uiBufferContext.clearRect(0, 0, width, height);
+    uiBufferContext.clearRect(0, 0, width, height);
     uiBufferContext.fillText(player.score.toString().padStart(3, 0), width, 12);
-    context.drawImage(uiBuffer, 320 - width, 0);
+    context.drawImage(uiBuffer, 320 - (width + 16), 0);
   };
   return drawUiLayer;
 };
